@@ -39,7 +39,8 @@ for (i in 1:length(files))
   assign(paste0("subject_",i), fread(paste0("../ecg/",files[i]), sep=";"))
 
   # for future analyses:
-  subject_list[[paste0("subject_",i)]] <- fread(paste0("../ecg/",files[i]), sep=";")
+  subject_list[[gsub("*.csv$", "", files[i])]] <- 
+    fread(paste0("../ecg/",files[i]), sep=";")
   
 # delete empty column
 
