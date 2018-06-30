@@ -3,6 +3,9 @@ library(tuneR)
 library(data.table)
 library(signal)
 
+# Basic first exploratory Bobbi MaM import script.
+# To be refactored when there is more data available.
+
 source("qrs_detect.R")
 source("peak_detect.R")
 
