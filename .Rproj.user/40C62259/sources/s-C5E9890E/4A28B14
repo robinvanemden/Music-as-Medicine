@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1530358865043.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "4A28B14",
+    "lastKnownWriteTime" : 1530286010,
+    "last_content_update" : 1530286010,
+    "path" : "~/GitHub/Music-as-Medicine/scripts/qrs_detect.R",
+    "project_path" : "scripts/qrs_detect.R",
+    "properties" : {
+        "cursorPosition" : "14,11",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
