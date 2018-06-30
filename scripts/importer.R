@@ -29,13 +29,10 @@ plot(music)
 
 subject_list <- list()
 
-# for now, we work with two files separately - but in the future, we will
-# of course define a function to do the work of the script,
-# which will take a subject_list as one of its arguments.
 files = list.files(path = "../ecg/", pattern="*.csv")
 for (i in 1:length(files)) 
 
-  # for now:
+  # for now, we work with two data frames seperately 
   assign(paste0("subject_",i), fread(paste0("../ecg/",files[i]), sep=";"))
 
   # for future analyses:
