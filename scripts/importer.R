@@ -4,7 +4,7 @@ library(data.table)
 library(signal)
 
 # Basic first exploratory Bobbi MaM import script.
-# To be refactored when there is more data available.
+# To be refactored when more data available.
 
 source("qrs_detect.R")
 source("peak_detect.R")
@@ -123,7 +123,7 @@ subject_2$seconds <- subject_2$seconds * scale_factor
 
 ########################################################## save between beeps data #######################################
 
-# export "between beeps" for visualisation in Sonic Visualizer
+# export "between beeps" data
 
 fwrite(subject_2[,c("seconds","heartrate")], "../export/subject_2_hr_between_beeps.csv")
 fwrite(subject_3[,c("seconds","heartrate")], "../export/subject_3_hr_between_beeps.csv")
@@ -155,7 +155,7 @@ subject_3$ms <- subject_3$ms - subject_3$ms[1]
 subject_2$seconds <- subject_2$seconds - subject_2$seconds[1]
 subject_3$seconds <- subject_3$seconds - subject_3$seconds[1]
 
-# plot overview of HR and MX to check if all seem right
+# plot overview of HR and MX to check if all seems right
 
 plot(subject_2$seconds/60, subject_2$mx, type = "l")
 plot(subject_3$seconds/60, subject_3$mx, type = "l")
@@ -178,7 +178,7 @@ plot(subject_3[ms>start & ms<end]$seconds, subject_3[ms>start & ms<end]$heartrat
 points(subject_3[ms>start & ms<end & is_peak == TRUE]$seconds,
        subject_3[ms>start & ms<end & is_peak == TRUE]$heartrate, col = "red")
 
-# export for visualisation in Sonic Visualizer
+# export for 17-24 minutes data
 
 fwrite(subject_2[,c("seconds","heartrate")], "../export/subject_2_hr_between_17_24.csv")
 fwrite(subject_3[,c("seconds","heartrate")], "../export/subject_3_hr_between_17_24.csv")
