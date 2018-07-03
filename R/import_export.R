@@ -21,7 +21,7 @@ source("qrs_detect.R")
 source("peak_detect.R")
 source("utils.R")
 
-setwd(here::here("scripts"))
+setwd(here::here("R"))
 
 
 ################################### import files #############################################################
