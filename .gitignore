@@ -1,2 +1,10 @@
 
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+progress.txt
+packrat/lib*/
+*.RData
+inst/doc
 music/music-as-medicine-cut-to-beeps.wav
