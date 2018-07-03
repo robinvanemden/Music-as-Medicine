@@ -1,31 +1,41 @@
+##############################################################################################################
+#
+#       Project:     Music as Medicine, Pilot two
+#       URL:         https://pavlov.tech/2018/06/29/syncing-bobbi-music-as-medicine/
+#       Purpose:     First exploration of Music as Medicine ECG data
+#       Date:        2018-07-03
+#       Author:      Robin van Emden, http://pavlov.tech
+#       Affiliation: Jheronimus Academy of Data Science, http://jads.nl
+#
+##############################################################################################################
+
+
+# A first fast and frugal exploratory Bobbi MaM import/export script
+
 library(here)
 library(tuneR)
 library(data.table)
 library(signal)
 
-# Basic first exploratory Bobbi MaM import script.
-# To be refactored when more data available.
-
 source("qrs_detect.R")
 source("peak_detect.R")
-
-lin_map <- function(x, from, to) {
-  (x - min(x)) / max(x - min(x)) * (to - from) + from
-}
+source("utils.R")
 
 setwd(here::here("scripts"))
 
-########################################################## import files #########################################################
 
-# read and plot music wav, that has been pre-cut to delete all before first and past last beeps
-# full range 0 to 4139.022 seconds
+################################### import files #############################################################
 
-# here, retrieve the part from 17 to 31 minutes - that is, the first musical intermezzo
 
-music <- readWave("../music/music-as-medicine-cut-to-beeps.wav", from = 17, to = 31, units = "minutes")
+# music was precut to between beeps with audacity - length: 0 to 4139.022 seconds
+# here, we load resulting WAV between 17 to 24 minutes - that is, the first musical intermezzo
+
+# load and plot music
+
+music <- readWave("../music/music-as-medicine-cut-to-beeps.wav", from = 17, to = 24, units = "minutes")
 plot(music)
 
-# read the bobbi data files in data dir
+# load ECG data
 
 subject_list <- list()
 
@@ -33,11 +43,13 @@ files = list.files(path = "../ecg/", pattern="*.csv")
 for (i in 1:length(files)) 
 
   # for now, we work with two data frames seperately 
+  
   assign(paste0("subject_",i), fread(paste0("../ecg/",files[i]), sep=";"))
 
   # for future analyses:
+  
   subject_list[[gsub("*.csv$", "", files[i])]] <- 
-    fread(paste0("../ecg/",files[i]), sep=";")
+  fread(paste0("../ecg/",files[i]), sep=";")
   
 # delete empty column
 
@@ -49,9 +61,12 @@ subject_3$V14 = NULL
 subject_2$idx <- seq.int(nrow(subject_2))
 subject_3$idx <- seq.int(nrow(subject_3))
 
-########################################################## filter    #########################################################
 
-# invert signal participant 3
+################################### filter ecg ###############################################################
+
+
+# invert polarity participant 3
+
 subject_3$heartrate <- -1* subject_3$heartrate
 
 # basic high pass filtering
@@ -69,7 +84,9 @@ subject_3$heartrate <- filter(lowpass, x=subject_3$heartrate)
 subject_2 <- peak_detect_wavelet(subject_2, 10)
 subject_3 <- peak_detect_wavelet(subject_3, 10)
 
-########################################################## cut to beeps ######################################################
+
+################################### cut to beeps #############################################################
+
 
 # find the start and end beeps
 
@@ -92,51 +109,49 @@ subject_3$ms <- subject_3$ms - subject_3$ms[1]
 subject_2$seconds <- subject_2$ms/1000
 subject_3$seconds <- subject_3$ms/1000
 
-########################################################## scale data to audio beeps #######################################
 
-# scale second scale correctly to music between beeps - nice and clean
+###################################  scale data to audio beeps ###############################################
+
+
+# scale ECG data to *exactly* length of audio recording between beeps 
+#
+# nice and clean way:
+#
 # subject_2$seconds <- lin_map(subject_3$seconds, 0, max_audio)
 # subject_3$seconds <- lin_map(subject_3$seconds, 0, max_audio)
+#
+# but for current analysis, we miss some data
+# so here, we get a scale factor from s3 and apply to s3 and s2
 
-# but... for current analysis, 
-# get the scale factor from s3 and apply to s3 and s2
-# assumption here: 
-# scale of subject_2 clock has same drift as subject_clock
-# this is the one part of our analysis that suffers from 
-# the not up-to-date bobbi firmware
 
-# save max subject_3 seconds
+# get max subject_3 
 
 max_s3 <- max(subject_3$second)
-
-# max audio in seconds
-
 max_audio <- 4139.022
 
-# scale factor
+# calculate scale factor
 
 scale_factor <- max_audio/max_s3
+
+# apply scale factor to both subjects
 
 subject_3$seconds <- subject_3$seconds * scale_factor
 subject_2$seconds <- subject_2$seconds * scale_factor
 
 
-########################################################## save between beeps data #######################################
+###################################  save between beeps ECG data #############################################
 
-# export "between beeps" data
 
 fwrite(subject_2[,c("seconds","heartrate")], "../export/subject_2_hr_between_beeps.csv")
 fwrite(subject_3[,c("seconds","heartrate")], "../export/subject_3_hr_between_beeps.csv")
 fwrite(subject_3[,c("seconds","mx")], "../export/subject_3_mx_between_beeps.csv")
 
-########################################################## save first musical intermezzo ##################################
 
-# now subsection export 
+###################################  plot first musical intermezzo ###########################################
 
-# cut to first musical element 
 
-start <- 17*1000*60  # music start at 17:00 minutes
-end   <- 24*1000*60  # music ends at 24:00 minutes
+start <- 17*1000*60  
+end   <- 24*1000*60  
 
 subject_2 <- subject_2[ms>start & ms<end]
 subject_3 <- subject_3[ms>start & ms<end]
@@ -165,7 +180,9 @@ points(subject_2[is_peak == TRUE]$seconds/60,subject_2[is_peak == TRUE]$heartrat
 plot(subject_3$seconds/60, subject_3$heartrate, type = "l")
 points(subject_3[is_peak == TRUE]$seconds/60,subject_3[is_peak == TRUE]$heartrate, col = "red")
 
-# lets zoom in a little 
+
+###################################  ECG close up plot #######################################################
+
 
 start <- 2*1000*60
 end   <- 2.3*1000*60
@@ -178,11 +195,25 @@ plot(subject_3[ms>start & ms<end]$seconds, subject_3[ms>start & ms<end]$heartrat
 points(subject_3[ms>start & ms<end & is_peak == TRUE]$seconds,
        subject_3[ms>start & ms<end & is_peak == TRUE]$heartrate, col = "red")
 
-# export for 17-24 minutes data
+
+###################################  save first musical intermezzo ###########################################
+
 
 fwrite(subject_2[,c("seconds","heartrate")], "../export/subject_2_hr_between_17_24.csv")
 fwrite(subject_3[,c("seconds","heartrate")], "../export/subject_3_hr_between_17_24.csv")
 
 fwrite(subject_2[is_peak==TRUE][,c("seconds","heartrate")], "../export/subject_2_peaks_between_17_24.csv")
 fwrite(subject_3[is_peak==TRUE][,c("seconds","heartrate")], "../export/subject_3_peaks_between_17_24.csv")
+
+
+###################################  PySpike export ##########################################################
+
+
+s2 <- subject_2[is_peak == TRUE][, "seconds"]
+s3 <- subject_3[is_peak == TRUE][, "seconds"]
+
+spikes <- t(as.matrix (Cbind(s2,s3)))
+
+write.table(spikes, file = "../export/spikes.txt", row.names = FALSE, col.names = FALSE, na = "")
+
 

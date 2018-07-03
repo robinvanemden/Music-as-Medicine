@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1530607357816.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3978995791",
+    "id" : "527F2DC8",
+    "lastKnownWriteTime" : 1530607368,
+    "last_content_update" : 1530607368780,
+    "path" : "~/GitHub/Music-as-Medicine/scripts/utils.R",
+    "project_path" : "scripts/utils.R",
+    "properties" : {
+        "cursorPosition" : "31,33",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
