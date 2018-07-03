@@ -1,4 +1,4 @@
-# Music as Medicine - Pilot two
+# Music as Medicine - Bobbi ECG Pilot Two
 
   ![music as medicine](https://github.com/robinvanemden/Music-as-Medicine/raw/master/img/ECG-VS-Music.gif)
 
